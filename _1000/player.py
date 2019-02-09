@@ -9,12 +9,26 @@ class Player:
         self._cards=[]
         self._allcards=allcards
         self._currentMax=0
+        self._history={}
+        self._jocker=None
 
+#[[c1,c2,c3]  ]
     def addCard(self,card):
         self._cards.append(card)
 
     def removeCards(self):
-            self._cards=[]
+        self._cards=[]
+
+    def setJocker(self,jocker):
+        self._jocker = jocker
+
+
+
+    def addHistory(self,takeNumber,takes,winner):
+       self._history[takeNumber]=(takes,winner)
+
+    def removeHistory(self):
+        self._history = {}
 
     def getName(self):
         return  self._name
@@ -74,6 +88,7 @@ class Player:
             res=(11,0)
         return res
 
+
     def getSuitList(self,suit):
         sortedCards = sorted(self._allcards, key=lambda x: (-x.getSuit(), -x.getValue()))
         filteredCards = filter(lambda x: x.getSuit() == suit, sortedCards)
@@ -123,7 +138,11 @@ class Player:
             if len(filteredCards)!=0:
                 sortedCards = sorted(filteredCards, key=lambda x: x.getValue())
             else:
-                sortedCards = sorted(self._cards, key=lambda x: x.getValue())
+                filteredCards = filter(lambda x: x.getSuit() == self._jocker, self._cards)
+                if len(filteredCards)!=0:
+                    sortedCards = sorted(filteredCards, key=lambda x: x.getValue())
+                else:
+                    sortedCards = sorted(self._cards, key=lambda x: x.getValue())
             playingCard = sortedCards[0]
 
         print "Player " + self._name +" moves with card "

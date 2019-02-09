@@ -50,6 +50,9 @@ class Round:
                 else:
                     print "The first was:"+nextPlayer.getName()
                     (nextPlayer,takes) = self.whoIsNext(nextPlayer,playingCards, jocker)
+                    for player in self._players:
+                        player.addHistory(i,takes,nextPlayer)
+                        player.setJocker(jocker)
                     print  "This round was won by " +nextPlayer.getName() +" who takes " + str(takes)
                     score=results.get(nextPlayer,0)
                     results[nextPlayer]=score+takes
