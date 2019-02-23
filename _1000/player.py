@@ -215,8 +215,15 @@ class Player:
             else:
                 return Card(CardValue.ACE,suit)
 
-
-
+    def getSuitByJocker(self,suit,heartsCard, diamondsCard, clubsCard, spadesCard):
+        if suit==Suit.HEARTS:
+            return heartsCard
+        elif suit==Suit.DIAMONDS:
+            return  diamondsCard
+        elif suit == Suit.CLUBS:
+            return clubsCard
+        else:
+            return spadesCard
 
     def calculateMove(self):
 
@@ -225,8 +232,9 @@ class Player:
         hasDiamonds = self.suitJoker(diamonds, Suit.DIAMONDS)>0
         hasClubs = self.suitJoker(clubs, Suit.CLUBS)>0
         hasSpades = self.suitJoker(spades, Suit.SPADES)>0
+        (heartsCard, diamondsCard, clubsCard, spadesCard) = self.getLeadingCards()
+
         if self._jocker==None:
-            (heartsCard, diamondsCard, clubsCard, spadesCard)=self.getLeadingCards()
 
             if heartsCard in self._cards and not hasHearts:
                 return heartsCard,None
@@ -263,4 +271,27 @@ class Player:
             #TO DO: if we have jocker
             # if option 1: new jocker
             # option 2: history jocker and leading cards
-            pass
+            leadingCard=self.getSuitByJocker(self._jocker,heartsCard, diamondsCard, clubsCard, spadesCard)
+            if leadingCard in self._cards:
+                return  leadingCard,None
+            elif hasHearts:
+                    return Card(CardValue.QUEEN, Suit.HEARTS), Suit.HEARTS
+            elif hasDiamonds:
+                    return Card(CardValue.QUEEN, Suit.DIAMONDS), Suit.DIAMONDS
+            elif hasClubs:
+                    return Card(CardValue.QUEEN, Suit.CLUBS), Suit.CLUBS
+            elif hasSpades:
+                    return Card(CardValue.QUEEN, Suit.SPADES), Suit.SPADES
+            else:
+                if heartsCard in self._cards:
+                    return heartsCard, None
+                elif diamondsCard in self._cards:
+                    return diamondsCard, None
+                elif clubsCard in self._cards:
+                    return clubsCard, None
+                elif spadesCard in self._cards:
+                    return spadesCard, None
+                else:
+                    sortedCards = sorted(self._cards, key=lambda x: x.getValue())
+                    return sortedCards[0]
+

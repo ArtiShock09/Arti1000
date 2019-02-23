@@ -27,8 +27,11 @@ if __name__ == "__main__":
             currentPlayers.append(players[(i+j)%3])
         round = Round( currentPlayers, cards)
         res=round.runRound()
+        #TO DO check if 880
         for player in players:
             score[player] += res[player]
+            if score[player]>=880:
+                score[player]=880
 
 
 

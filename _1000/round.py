@@ -4,10 +4,12 @@ from card import *
 class Round:
 
 
-    def __init__(self,players,allcards):
+    def __init__(self,players,allcards,barrel,onBarrel):
         self._joker=[]
         self._players=players
         self._cards=allcards
+        self._barrel=barrel
+        self._onBarrel=onBarrel
 
     def giveCards(self):
         import random
@@ -31,9 +33,15 @@ class Round:
         self.removeCards()
         self.giveCards()
         results={}
+        defaultScore=[95,95,95]
+        i=0
         for player in self._players:
             results[player]=0
-        maxVal,maxPlayer= self.trade([95,95,95])
+            if self._barrel and player==self._onBarrel:
+                defaultScore[i]+=20
+            i += 1
+
+        maxVal,maxPlayer= self.trade(defaultScore)
         if maxVal!=0:
             self.giveJoker(maxPlayer)
             (maxVal,card1,card2)=maxPlayer.evalAndGiveCards(maxVal)
@@ -62,17 +70,28 @@ class Round:
                 for j in range(3):
                     print  "Now is move by " +nextPlayer.getName()
                     card,jocker=nextPlayer.move(playingCards)
+                    results=self.addMarriagePoints(jocker,nextPlayer,results)
                     playingCards.append(card)
                     nextPlayer = self.getNextPlayer(nextPlayer)
             if results[maxPlayer]>=maxVal:
                 results[maxPlayer]= maxVal
+                return results
 
             else:
                 results[maxPlayer] = -maxVal
-
+                return results
 
         return results
-
+    def addMarriagePoints(self,jocker,player,results):
+        if jocker==Suit.HEARTS:
+             results[player]+=100
+        elif jocker==Suit.DIAMONDS:
+            results[player] +=80
+        elif jocker == Suit.CLUBS:
+            results[player] += 60
+        elif jocker == Suit.SPADES:
+            results[player] += 40
+        return results
 
     def getNextPlayer(self,player):
         i=0
