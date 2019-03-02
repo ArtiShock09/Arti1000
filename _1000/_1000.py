@@ -21,17 +21,49 @@ if __name__ == "__main__":
     score = {}
     for player in players:
         score[player]=0
+    barrel=False
+    onBarrel=None
+    barrelCounter=0
+    gameEnd=False
     for i in range(100):
         currentPlayers=[]
         for j in range(3):
             currentPlayers.append(players[(i+j)%3])
-        round = Round( currentPlayers, cards)
+        round = Round( currentPlayers, cards,barrel,onBarrel)
         res=round.runRound()
-        #TO DO check if 880
         for player in players:
             score[player] += res[player]
+
+            if score[player]>=1000 and player==onBarrel:
+                print "Congratulations "+"player "+player.getName()+" won"
+                gameEnd=True
+                break
             if score[player]>=880:
                 score[player]=880
+                if not barrel:
+                    barrel=True
+                    onBarrel=player
+            if barrel and  player==onBarrel and score[player]<880:
+                barrel = False
+                onBarrel = None
+                barrelCounter=0
+            elif barrel and  player==onBarrel and barrelCounter>=3:
+                score[player] -=120
+                barrel = False
+                onBarrel = None
+                barrelCounter = 0
+        if gameEnd:
+            break
+        if barrel:
+            barrelCounter+=1
+        else:
+            for player in players:
+                if score[player]>=880:
+                    barrel=True
+                    onBarrel=player
+                    barrelCounter=1
+                    break
+
 
 
 

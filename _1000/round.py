@@ -49,7 +49,7 @@ class Round:
             filteredPlayers[0].addCard(card1)
             filteredPlayers[1].addCard(card2)
 
-            jocker=0
+            jocker=None
             takes=[]
             playingCards = []
             for i in range(8):
@@ -59,7 +59,7 @@ class Round:
                     print "The first was:"+nextPlayer.getName()
                     (nextPlayer,takes) = self.whoIsNext(nextPlayer,playingCards, jocker)
                     for player in self._players:
-                        player.addHistory(i,takes,nextPlayer)
+                        player.addHistory(i,playingCards,nextPlayer)
                         player.setJocker(jocker)
                     print  "This round was won by " +nextPlayer.getName() +" who takes " + str(takes)
                     score=results.get(nextPlayer,0)
@@ -69,8 +69,11 @@ class Round:
                 playingCards = []
                 for j in range(3):
                     print  "Now is move by " +nextPlayer.getName()
-                    card,jocker=nextPlayer.move(playingCards)
-                    results=self.addMarriagePoints(jocker,nextPlayer,results)
+                    nextPlayer.setJocker(jocker)
+                    card,newJocker=nextPlayer.move(playingCards)
+                    results=self.addMarriagePoints(newJocker,nextPlayer,results)
+                    if newJocker !=None:
+                        jocker=newJocker
                     playingCards.append(card)
                     nextPlayer = self.getNextPlayer(nextPlayer)
             if results[maxPlayer]>=maxVal:

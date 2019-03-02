@@ -157,6 +157,9 @@ class Player:
                 (playingCard,jocker)=self.calculateMove()
 
         else:
+            # check history and move with leading card if we have it
+            # if we do not have move with smallest card
+
             leadingSuit = playingCards[0].getSuit()
             filteredCards = filter(lambda x: x.getSuit() == leadingSuit, self._cards)
             if len(filteredCards)!=0:
@@ -204,16 +207,28 @@ class Player:
         res=[]
         (heartsHist, diamondsHist, clubsHist, spadesHist)=self.prepareEval(self._historyCards)
         (heartsAll, diamondsAll, clubsAll, spadesAll)=self.prepareEval(self._allcards)
-        return (self.getLeadingCard(heartsHist,heartsAll),self.getLeadingCard(diamondsHist,diamondsAll),self.getLeadingCard(spadesHist,spadesAll))
+        return (self.getLeadingCard(heartsHist,Suit.HEARTS),self.getLeadingCard(diamondsHist,Suit.DIAMONDS),self.getLeadingCard(clubsHist,Suit.CLUBS),
+                self.getLeadingCard(spadesHist,Suit.SPADES))
 
-    def getLeadingCard(self,histCards,cardsAll,suit):
+    def getLeadingCard(self,histCards,suit):
             #TO DO get max card
-            temp=list(set(cardsAll)-set(histCards))
-            sortedCards = sorted(temp, key=lambda x: -x.getValue())
-            if  len(sortedCards)!=0:
-                return sortedCards[0]
-            else:
-                return Card(CardValue.ACE,suit)
+            i=0
+            for card in histCards:
+                if card==0:
+                    break
+                i+=1
+            if i==0:
+                return self.getCardFromAllCards(CardValue.ACE,suit)
+            elif i==1:
+                return self.getCardFromAllCards(CardValue.TEN, suit)
+            elif i == 2:
+                return self.getCardFromAllCards(CardValue.KING, suit)
+            elif i == 3:
+                return self.getCardFromAllCards(CardValue.QUEEN, suit)
+            elif i == 4:
+                return self.getCardFromAllCards(CardValue.JACK, suit)
+            elif i == 5:
+                return self.getCardFromAllCards(CardValue.NINE, suit)
 
     def getSuitByJocker(self,suit,heartsCard, diamondsCard, clubsCard, spadesCard):
         if suit==Suit.HEARTS:
@@ -224,6 +239,12 @@ class Player:
             return clubsCard
         else:
             return spadesCard
+
+    def getCardFromAllCards(self,cardValue, suit):
+        for card in self._allcards:
+            if card.getValue()==cardValue and card.getSuit()==suit:
+                return card
+
 
     def calculateMove(self):
 
@@ -245,28 +266,18 @@ class Player:
             elif spadesCard in self._cards and not hasSpades:
                 return spadesCard,None
             elif hasHearts:
-                if heartsCard in self._cards:
-                    return heartsCard, None
-                else:
-                    return  Card(CardValue.QUEEN,Suit.HEARTS),Suit.HEARTS
+                return  self.getCardFromAllCards(CardValue.QUEEN,Suit.HEARTS),Suit.HEARTS
             elif hasDiamonds:
-                if diamondsCard in self._cards:
-                    return diamondsCard, None
-                else:
-                    return Card(CardValue.QUEEN, Suit.DIAMONDS), Suit.DIAMONDS
+
+                return self.getCardFromAllCards(CardValue.QUEEN, Suit.DIAMONDS), Suit.DIAMONDS
             elif hasClubs:
-                if clubsCard in self._cards:
-                    return clubsCard, None
-                else:
-                    return Card(CardValue.QUEEN, Suit.CLUBS), Suit.CLUBS
+
+                return self.getCardFromAllCards(CardValue.QUEEN, Suit.CLUBS), Suit.CLUBS
             elif hasSpades:
-                if spadesCard in self._cards:
-                    return spadesCard, None
-                else:
-                    return Card(CardValue.QUEEN, Suit.SPADES), Suit.SPADES
+                    return self.getCardFromAllCards(CardValue.QUEEN, Suit.SPADES), Suit.SPADES
             else:
                 sortedCards = sorted(self._cards, key=lambda x: x.getValue())
-                return sortedCards[0]
+                return sortedCards[0],None
         else:
             #TO DO: if we have jocker
             # if option 1: new jocker
@@ -275,13 +286,13 @@ class Player:
             if leadingCard in self._cards:
                 return  leadingCard,None
             elif hasHearts:
-                    return Card(CardValue.QUEEN, Suit.HEARTS), Suit.HEARTS
+                    return self.getCardFromAllCards(CardValue.QUEEN, Suit.HEARTS), Suit.HEARTS
             elif hasDiamonds:
-                    return Card(CardValue.QUEEN, Suit.DIAMONDS), Suit.DIAMONDS
+                    return self.getCardFromAllCards(CardValue.QUEEN, Suit.DIAMONDS), Suit.DIAMONDS
             elif hasClubs:
-                    return Card(CardValue.QUEEN, Suit.CLUBS), Suit.CLUBS
+                    return self.getCardFromAllCards(CardValue.QUEEN, Suit.CLUBS), Suit.CLUBS
             elif hasSpades:
-                    return Card(CardValue.QUEEN, Suit.SPADES), Suit.SPADES
+                    return self.getCardFromAllCards(CardValue.QUEEN, Suit.SPADES), Suit.SPADES
             else:
                 if heartsCard in self._cards:
                     return heartsCard, None
@@ -293,5 +304,5 @@ class Player:
                     return spadesCard, None
                 else:
                     sortedCards = sorted(self._cards, key=lambda x: x.getValue())
-                    return sortedCards[0]
+                    return sortedCards[0],None
 
