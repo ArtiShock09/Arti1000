@@ -14,6 +14,10 @@ class Player:
         self._jocker=None
 
 #[[c1,c2,c3]  ]
+
+    def resetMax(self):
+        self._currentMax=0
+
     def addCard(self,card):
         self._cards.append(card)
 
@@ -23,6 +27,8 @@ class Player:
     def setJocker(self,jocker):
         self._jocker = jocker
 
+    def resetJocker(self):
+        self._jocker = None
 
 
     def addHistory(self,takeNumber,takes,winner):
@@ -163,23 +169,52 @@ class Player:
             leadingSuit = playingCards[0].getSuit()
             filteredCards = filter(lambda x: x.getSuit() == leadingSuit, self._cards)
             if len(filteredCards)!=0:
-                sortedCards = sorted(filteredCards, key=lambda x: x.getValue())
+                playingCard = self.getBestCardNotStarting(filteredCards, playingCards, self._jocker)
             else:
                 filteredCards = filter(lambda x: x.getSuit() == self._jocker, self._cards)
                 if len(filteredCards)!=0:
-                    sortedCards = sorted(filteredCards, key=lambda x: x.getValue())
+                    playingCard=self.getBestCardNotStartingJocker(filteredCards,playingCards,self._jocker)
                 else:
                     sortedCards = sorted(self._cards, key=lambda x: x.getValue())
-            playingCard = sortedCards[0]
+                    playingCard = sortedCards[0]
 
         print "Player " + self._name +" moves with card "
         playingCard.printCard()
 
         self._cards.remove(playingCard)
-        return (playingCard,jocker)
+        return playingCard,jocker
 
 
+    def getBestCardNotStarting(self, cardsPlayingSuit, alreadyPlaidCards, jocker):
+        sortedCards = sorted(cardsPlayingSuit, key=lambda x: -x.getValue())
+        maxOurCard = sortedCards[0]
+        minOurCard = sortedCards[len(sortedCards) - 1]
+        if len(alreadyPlaidCards) == 1:
+            if maxOurCard.getValue() > alreadyPlaidCards[0].getValue():
+                return maxOurCard
+            else:
+                return minOurCard
+        else:
+            if alreadyPlaidCards[0].getSuit() == alreadyPlaidCards[1].getSuit() or alreadyPlaidCards[
+                1].getSuit() != jocker:
+                for card in alreadyPlaidCards:
+                    if maxOurCard.getValue() > card.getValue():
+                        return maxOurCard
+                return minOurCard
+            else:
+                return minOurCard
 
+    def getBestCardNotStartingJocker(self, cardsPlayingSuit, alreadyPlaidCards, jocker):
+        sortedCards = sorted(cardsPlayingSuit, key=lambda x: -x.getValue())
+        maxOurCard = sortedCards[0]
+        minOurCard = sortedCards[len(sortedCards) - 1]
+        if len(alreadyPlaidCards) == 1:
+                return minOurCard
+        else:
+            if  alreadyPlaidCards[1].getSuit() != jocker:
+                return minOurCard
+            else:
+                return maxOurCard
 
     def trade(self,min):
         res=self.eval()

@@ -25,7 +25,7 @@ if __name__ == "__main__":
     onBarrel=None
     barrelCounter=0
     gameEnd=False
-    for i in range(100):
+    for i in range(1000):
         currentPlayers=[]
         for j in range(3):
             currentPlayers.append(players[(i+j)%3])

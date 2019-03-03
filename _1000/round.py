@@ -37,6 +37,9 @@ class Round:
         i=0
         for player in self._players:
             results[player]=0
+            player.resetMax()
+            player.removeHistory()
+            player.resetJocker()
             if self._barrel and player==self._onBarrel:
                 defaultScore[i]+=20
             i += 1
